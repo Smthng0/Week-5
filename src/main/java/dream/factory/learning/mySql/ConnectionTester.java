@@ -1,11 +1,13 @@
-package dream.factory.learning.postgreSql;
+package dream.factory.learning.mySql;
 
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 
-public class connectionTester {
+public class ConnectionTester {
     public static void main(String[] args) {
-        String url = "jdbc:postgresql://localhost:5432/minions";
-        String username = "frane";
+        String url = "jdbc:mysql://localhost:3306/minions";
+        String username = "root";
         String password = "";
 
         System.out.println("Connecting database...");
@@ -13,20 +15,17 @@ public class connectionTester {
         try (Connection connection = DriverManager.getConnection(url, username, password)) {
             System.out.println("Database connected!");
 
-            String update = "insert into ability_minions (title, mana_cost, " +
-                    "attack, health, abilities) " +
-                    "values ('faca', 0, 1, 2, '')";
-
             Statement statement = connection.createStatement();
-            statement.executeUpdate(update);
 
-            String query = "select * from ability_minions;";
+            List<String> minionList = new ArrayList<>();
+            String query = "select * from plain_minions;";
             ResultSet resultSet = statement.executeQuery(query);
             while (resultSet.next()) {
                 System.out.println(resultSet.getString(1) + " "
                         + resultSet.getInt(2) + " "
                         + resultSet.getInt(3) + " "
                         + resultSet.getInt(4));
+                minionList.add(resultSet.getString(1));
             }
 
 
@@ -34,4 +33,6 @@ public class connectionTester {
             throw new IllegalStateException("Cannot connect the database!", e);
         }
     }
+
+
 }

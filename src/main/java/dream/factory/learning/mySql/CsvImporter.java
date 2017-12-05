@@ -46,8 +46,8 @@ public class CsvImporter {
         try {
             return "insert into plain_minions " +
                     "(title, mana_cost, attack, health) " +
-                    "values (\"" + row[1]+
-                    "\", " + row[0] +
+                    "values ('" + row[1]+
+                    "', " + row[0] +
                     ", " + row[2] +
                     ", " + row[3] + ")";
         } catch (Exception ex){
