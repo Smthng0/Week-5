@@ -1,7 +1,9 @@
 package dream.factory.learning.mySql;
 
+import com.univocity.parsers.common.processor.BeanListProcessor;
 import com.univocity.parsers.csv.CsvParser;
 import com.univocity.parsers.csv.CsvParserSettings;
+import dream.factory.learning.postgreSql.Minion;
 
 import java.io.InputStreamReader;
 import java.io.Reader;
@@ -20,11 +22,11 @@ public class CsvImporter {
             System.out.println("Database connected!");
             Statement statement = connection.createStatement();
             CsvImporter kifla = new CsvImporter();
-            List<String[]> minionList = kifla.parseCsv();
+            List<Minion> minionList = kifla.parseCsv();
             statement.executeUpdate("truncate table plain_minions");
 
-            for (String [] row : minionList) {
-                String query = kifla.insertRowToDb(row);
+            for (Minion minion : minionList) {
+                String query = kifla.insertRowToDb(minion);
                 statement.executeUpdate(query);
             }
 
@@ -34,22 +36,24 @@ public class CsvImporter {
         }
     }
 
-    public List<String[]> parseCsv() {
+    public List<Minion> parseCsv() {
         CsvParserSettings settings = new CsvParserSettings();
         settings.getFormat().setLineSeparator("\n");
+        BeanListProcessor<Minion> processor = new BeanListProcessor<>(Minion.class);
+        settings.setProcessor(processor);
         CsvParser parser = new CsvParser(settings);
-
-        return parser.parseAll(getReader("/file/PlainMinions.csv"));
+        parser.parse(getReader("/file/PlainMinions.csv"));
+        return processor.getBeans();
     }
 
-    public String insertRowToDb(String[] row){
+    public String insertRowToDb(Minion minion){
         try {
             return "insert into plain_minions " +
                     "(title, mana_cost, attack, health) " +
-                    "values ('" + row[1]+
-                    "', " + row[0] +
-                    ", " + row[2] +
-                    ", " + row[3] + ")";
+                    "values ('" + minion.getTitle()+
+                    "', " + minion.getManaCost() +
+                    ", " + minion.getAttack() +
+                    ", " + minion.getHealth() + ")";
         } catch (Exception ex){
             ex.printStackTrace();
         }

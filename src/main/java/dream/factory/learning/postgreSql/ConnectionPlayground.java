@@ -39,7 +39,7 @@ public class ConnectionPlayground implements Runnable{
         }
     }
 
-    private static ComboPooledDataSource getCPDS() {
+    public static ComboPooledDataSource getCPDS() {
         ComboPooledDataSource cpds = new ComboPooledDataSource();
         cpds.setJdbcUrl(url);
         cpds.setUser(username);

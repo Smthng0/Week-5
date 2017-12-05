@@ -1,5 +1,6 @@
 package dream.factory.learning.postgreSql;
 
+import com.univocity.parsers.common.processor.BeanListProcessor;
 import com.univocity.parsers.csv.CsvParser;
 import com.univocity.parsers.csv.CsvParserSettings;
 
@@ -9,7 +10,6 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.Arrays;
 import java.util.List;
 
 public class CsvImporter {
@@ -23,13 +23,12 @@ public class CsvImporter {
         try (Connection connection = DriverManager.getConnection(url, username, password)) {
             System.out.println("Database connected!");
             Statement statement = connection.createStatement();
-            CsvImporter kifla = new CsvImporter();
-            List<String[]> minionList = kifla.parseCsv();
+            CsvImporter importer = new CsvImporter();
+            List<Minion> minionList = importer.parseCsv();
             statement.executeUpdate("truncate table ability_minions");
 
-            for (String [] row : minionList) {
-                System.out.println(Arrays.toString(row));
-                String query = kifla.insertRowToDb(row);
+            for (Minion minion : minionList) {
+                String query = importer.insertRowToDb(minion);
                 statement.executeUpdate(query);
             }
 
@@ -39,23 +38,26 @@ public class CsvImporter {
         }
     }
 
-    public List<String[]> parseCsv() {
+    public List<Minion> parseCsv() {
         CsvParserSettings settings = new CsvParserSettings();
         settings.getFormat().setLineSeparator("\n");
+        BeanListProcessor<Minion> processor = new BeanListProcessor<>(Minion.class);
+        settings.setProcessor(processor);
         CsvParser parser = new CsvParser(settings);
-
-        return parser.parseAll(getReader("/file/AbilityMinions.csv"));
+        parser.parse(getReader("/file/AbilityMinions.csv"));
+        return processor.getBeans();
     }
 
-    public String insertRowToDb(String[] row){
+    public String insertRowToDb(Minion minion){
         try {
             return "insert into ability_minions " +
                     "(title, mana_cost, attack, health, abilities) " +
-                    "values ('" + row[1]+
-                    "', " + row[0] +
-                    ", " + row[2] +
-                    ", " + row[3] +
-                    ", '" + row[4] + "')";
+                    "values ('" + minion.getTitle()+
+                    "', " + minion.getManaCost() +
+                    ", " + minion.getAttack() +
+                    ", " + minion.getHealth() +
+                    ", '" + minion.getAbilities() + "')";
+
         } catch (Exception ex){
             ex.printStackTrace();
         }
