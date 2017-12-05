@@ -25,7 +25,7 @@ public class CsvImporter {
             Statement statement = connection.createStatement();
             CsvImporter kifla = new CsvImporter();
             List<String[]> minionList = kifla.parseCsv();
-     //       statement.executeUpdate("truncate table ability_minions");
+            statement.executeUpdate("truncate table ability_minions");
 
             for (String [] row : minionList) {
                 System.out.println(Arrays.toString(row));
