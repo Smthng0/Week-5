@@ -13,12 +13,7 @@ public class ConnectionTester {
         try (Connection connection = DriverManager.getConnection(url, username, password)) {
             System.out.println("Database connected!");
 
-            String update = "insert into ability_minions (title, mana_cost, " +
-                    "attack, health, abilities) " +
-                    "values ('faca', 0, 1, 2, '')";
-
             Statement statement = connection.createStatement();
-            statement.executeUpdate(update);
 
             String query = "select * from ability_minions;";
             ResultSet resultSet = statement.executeQuery(query);
@@ -26,7 +21,8 @@ public class ConnectionTester {
                 System.out.println(resultSet.getString(1) + " "
                         + resultSet.getInt(2) + " "
                         + resultSet.getInt(3) + " "
-                        + resultSet.getInt(4));
+                        + resultSet.getInt(4) + " "
+                        + resultSet.getString(5));
             }
 
 
